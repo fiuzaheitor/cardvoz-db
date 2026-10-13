@@ -10,20 +10,23 @@ Este repositório é a **fonte da verdade do banco**: a [`cardvoz-api`](../cardv
 supabase/
 ├── config.toml                                  # Configuração do Supabase CLI
 ├── migrations/
-│   └── 20261012000000_schema_inicial.sql        # Tabelas, índices e segurança (RLS)
-└── seed.sql                                     # 4 baralhos de exemplo com 4 fichas cada
+│   ├── 20261012000000_schema_inicial.sql        # Primeira versão (IDs numéricos, sem usuários)
+│   └── 20261013000000_usuarios_e_ids_aleatorios.sql  # Usuários, login e IDs UUID (recria as tabelas)
+└── seed.sql                                     # Vazio: os baralhos são privados de cada usuário
 ```
 
 ### Tabelas
 
 | Tabela | Conteúdo |
 |---|---|
-| `"Decks"` | Baralhos (título, categoria, descrição, slug único) |
+| `"Users"` | Contas (nome, e-mail único em minúsculas, hash da senha, bloqueio por tentativas) |
+| `"RefreshTokens"` | Sessões de login (só o hash SHA-256 do token, validade, revogação) |
+| `"Decks"` | Baralhos de cada usuário (título, categoria, descrição, slug único por usuário) |
 | `"Cards"` | Fichas de cada baralho (pergunta, resposta, ordem) |
 | `"StudySessions"` | Sessões de estudo (acertos, erros, início e fim) |
 | `"StudyReviews"` | Cada resposta dada numa sessão |
 
-Os nomes seguem o padrão do Entity Framework da API (PascalCase), então no SQL Editor do Supabase precisam de aspas: `SELECT * FROM "Decks";`
+Todos os IDs são UUID v4 aleatórios. Os nomes seguem o padrão do Entity Framework da API (PascalCase), então no SQL Editor do Supabase precisam de aspas: `SELECT * FROM "Decks";`
 
 ## Segurança
 
@@ -46,18 +49,18 @@ npx supabase login
 #    (o "Reference ID" fica em Project Settings → General)
 npx supabase link --project-ref <reference-id>
 
-# 3. Primeira vez: cria as tabelas e insere os baralhos de exemplo
-npx supabase db push --include-seed
+# 3. Cria as tabelas
+npx supabase db push
 ```
 
-Depois disso, a cada nova migration basta rodar `npx supabase db push`. O seed é seguro para rodar de novo: ele só insere dados se ainda não houver nenhum baralho.
+Depois disso, a cada nova migration basta rodar `npx supabase db push`. Não há dados de exemplo: cada pessoa cria a própria conta pela API (`POST /api/auth/register`).
 
 ## Conectar a API
 
 No painel do Supabase, clique em **Connect → Session pooler** e copie a URI (porta 5432). Na `cardvoz-api`, coloque-a na variável `ConnectionStrings__DefaultConnection`, trocando `[YOUR-PASSWORD]` pela senha do banco.
 
 - Use o **pooler**, não a conexão direta: a conexão direta do plano gratuito só funciona por IPv6, que hospedagens como o Render não suportam.
-- Prefira uma senha só com letras e números: caracteres como `@`, `#` e `/` quebram a URI (ou precisam ser codificados, ex.: `@` → `%40`).
+- A senha pode ter qualquer caractere: a API lê a URI sem depender de codificação. Troque `[YOUR-PASSWORD]` inteiro, inclusive os colchetes.
 
 ## Criar uma nova migration
 
