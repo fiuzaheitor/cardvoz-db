@@ -11,7 +11,8 @@ supabase/
 ├── config.toml                                  # Configuração do Supabase CLI
 ├── migrations/
 │   ├── 20261012000000_schema_inicial.sql        # Primeira versão (IDs numéricos, sem usuários)
-│   └── 20261013000000_usuarios_e_ids_aleatorios.sql  # Usuários, login e IDs UUID (recria as tabelas)
+│   ├── 20261013000000_usuarios_e_ids_aleatorios.sql  # Usuários, login e IDs UUID (recria as tabelas)
+│   └── 20261021000000_login_google.sql          # Login com Google (não apaga dados)
 └── seed.sql                                     # Vazio: os baralhos são privados de cada usuário
 ```
 
@@ -19,7 +20,7 @@ supabase/
 
 | Tabela | Conteúdo |
 |---|---|
-| `"Users"` | Contas (nome, e-mail único em minúsculas, hash da senha, bloqueio por tentativas) |
+| `"Users"` | Contas (nome, e-mail único em minúsculas, ID da conta Google, hash da senha — nulo em quem entra só pelo Google —, bloqueio por tentativas) |
 | `"RefreshTokens"` | Sessões de login (só o hash SHA-256 do token, validade, revogação) |
 | `"Decks"` | Baralhos de cada usuário (título, categoria, descrição, slug único por usuário) |
 | `"Cards"` | Fichas de cada baralho (pergunta, resposta, ordem) |
@@ -53,7 +54,7 @@ npx supabase link --project-ref <reference-id>
 npx supabase db push
 ```
 
-Depois disso, a cada nova migration basta rodar `npx supabase db push`. Não há dados de exemplo: cada pessoa cria a própria conta pela API (`POST /api/auth/register`).
+Depois disso, a cada nova migration basta rodar `npx supabase db push`. Não há dados de exemplo: cada pessoa cria a própria conta ao entrar com o Google no site (`POST /api/auth/google`).
 
 ## Conectar a API
 
