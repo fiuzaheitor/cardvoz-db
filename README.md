@@ -12,7 +12,8 @@ supabase/
 ├── migrations/
 │   ├── 20261012000000_schema_inicial.sql        # Primeira versão (IDs numéricos, sem usuários)
 │   ├── 20261013000000_usuarios_e_ids_aleatorios.sql  # Usuários, login e IDs UUID (recria as tabelas)
-│   └── 20261021000000_login_google.sql          # Login com Google (não apaga dados)
+│   ├── 20261021000000_login_google.sql          # Login com Google (não apaga dados)
+│   └── 20261029000000_admin_e_baralhos_compartilhados.sql  # Admin e baralhos compartilhados (não apaga dados)
 └── seed.sql                                     # Vazio: os baralhos são privados de cada usuário
 ```
 
@@ -20,9 +21,9 @@ supabase/
 
 | Tabela | Conteúdo |
 |---|---|
-| `"Users"` | Contas (nome, e-mail único em minúsculas, ID da conta Google, hash da senha — nulo em quem entra só pelo Google —, bloqueio por tentativas) |
+| `"Users"` | Contas (nome, e-mail único em minúsculas, ID da conta Google, hash da senha — nulo em quem entra só pelo Google —, bloqueio por tentativas, se é admin do painel) |
 | `"RefreshTokens"` | Sessões de login (só o hash SHA-256 do token, validade, revogação) |
-| `"Decks"` | Baralhos de cada usuário (título, categoria, descrição, slug único por usuário) |
+| `"Decks"` | Baralhos de cada usuário (título, categoria, descrição, slug único por usuário). Sem dono (`"UserId"` nulo) = baralho compartilhado, criado pelo painel |
 | `"Cards"` | Fichas de cada baralho (pergunta, resposta, ordem) |
 | `"StudySessions"` | Sessões de estudo (acertos, erros, início e fim) |
 | `"StudyReviews"` | Cada resposta dada numa sessão |
@@ -54,7 +55,17 @@ npx supabase link --project-ref <reference-id>
 npx supabase db push
 ```
 
-Depois disso, a cada nova migration basta rodar `npx supabase db push`. Não há dados de exemplo: cada pessoa cria a própria conta ao entrar com o Google no site (`POST /api/auth/google`).
+Depois disso, a cada nova migration basta rodar `npx supabase db push`. Não há dados de exemplo: cada pessoa cria a própria conta no site.
+
+### Primeiro admin do painel
+
+Ninguém nasce admin. Depois de criar sua conta no site, abra o **SQL Editor** do Supabase e rode, com o seu e-mail:
+
+```sql
+UPDATE "Users" SET "IsAdmin" = true WHERE "Email" = 'seu-email@exemplo.com';
+```
+
+Os próximos admins são definidos pelo próprio painel (`cardvoz-admin`), na página **Usuários**.
 
 ## Conectar a API
 
