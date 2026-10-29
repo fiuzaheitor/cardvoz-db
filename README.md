@@ -23,7 +23,7 @@ supabase/
 |---|---|
 | `"Users"` | Contas (nome, e-mail único em minúsculas, ID da conta Google, hash da senha — nulo em quem entra só pelo Google —, bloqueio por tentativas, se é admin do painel) |
 | `"RefreshTokens"` | Sessões de login (só o hash SHA-256 do token, validade, revogação) |
-| `"Decks"` | Baralhos de cada usuário (título, categoria, descrição, slug único por usuário). Sem dono (`"UserId"` nulo) = baralho compartilhado, criado pelo painel |
+| `"Decks"` | Baralhos de cada usuário (título, categoria, descrição, slug único por usuário). Sem dono (`"UserId"` nulo) = baralho compartilhado, criado pelo painel; `"SourceDeckId"` aponta de qual compartilhado uma cópia veio |
 | `"Cards"` | Fichas de cada baralho (pergunta, resposta, ordem) |
 | `"StudySessions"` | Sessões de estudo (acertos, erros, início e fim) |
 | `"StudyReviews"` | Cada resposta dada numa sessão |
