@@ -13,7 +13,8 @@ supabase/
 │   ├── 20261012000000_schema_inicial.sql        # Primeira versão (IDs numéricos, sem usuários)
 │   ├── 20261013000000_usuarios_e_ids_aleatorios.sql  # Usuários, login e IDs UUID (recria as tabelas)
 │   ├── 20261021000000_login_google.sql          # Login com Google (não apaga dados)
-│   └── 20261029000000_admin_e_baralhos_compartilhados.sql  # Admin e baralhos compartilhados (não apaga dados)
+│   ├── 20261029000000_admin_e_baralhos_compartilhados.sql  # Admin e baralhos compartilhados (não apaga dados)
+│   └── 20261030000000_idioma_das_fichas.sql     # Idioma das perguntas e das respostas (não apaga dados)
 └── seed.sql                                     # Vazio: os baralhos são privados de cada usuário
 ```
 
@@ -23,7 +24,7 @@ supabase/
 |---|---|
 | `"Users"` | Contas (nome, e-mail único em minúsculas, ID da conta Google, hash da senha — nulo em quem entra só pelo Google —, bloqueio por tentativas, se é admin do painel) |
 | `"RefreshTokens"` | Sessões de login (só o hash SHA-256 do token, validade, revogação) |
-| `"Decks"` | Baralhos de cada usuário (título, categoria, descrição, slug único por usuário). Sem dono (`"UserId"` nulo) = baralho compartilhado, criado pelo painel; `"SourceDeckId"` aponta de qual compartilhado uma cópia veio |
+| `"Decks"` | Baralhos de cada usuário (título, categoria, descrição, slug único por usuário). Sem dono (`"UserId"` nulo) = baralho compartilhado, criado pelo painel; `"SourceDeckId"` aponta de qual compartilhado uma cópia veio; `"QuestionLanguage"`/`"AnswerLanguage"` guardam o idioma das fichas (nulo = português) |
 | `"Cards"` | Fichas de cada baralho (pergunta, resposta, ordem) |
 | `"StudySessions"` | Sessões de estudo (acertos, erros, início e fim) |
 | `"StudyReviews"` | Cada resposta dada numa sessão |
